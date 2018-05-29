@@ -163,24 +163,25 @@ void FC_FUNC(dspaces_get, DSPACES_GET) (const char *var_name,
         unsigned int *ver, int *size, int *ndim,
         uint64_t *lb, uint64_t *ub, void *data, int *err, int len)
 {
-	char vname[256];
+    char vname[256];
+    int p_lev=0; //Yubo tmp fix for MT project
 
     if (!fstrncpy(vname, var_name, (size_t) len, sizeof(vname))) {
-		uloga("'%s()': failed, can not copy Fortran var of len %d.\n", 
-			__func__, len);
-		*err = -ENOMEM;
-	}
+        uloga("'%s()': failed, can not copy Fortran var of len %d.\n", 
+            __func__, len);
+        *err = -ENOMEM;
+    }
 
-	*err = common_dspaces_get(vname, *ver, *size, *ndim, lb, ub, data);
+    *err = common_dspaces_get(vname, *ver, *size, *ndim, lb, ub, data, p_lev); //Yubo tmp fix
 }
 
 /*
 void FC_FUNC(dspaces_get_versions, DSPACES_GET_VERSIONS)(int *num_vers, int *versions, int *err)
 {
-	int n, *vers_tab;
+    int n, *vers_tab;
 
-	n = common_dspaces_get_versions(&vers_tab);
-	memcpy(versions, vers_tab, n * sizeof(int));
+    n = common_dspaces_get_versions(&vers_tab);
+    memcpy(versions, vers_tab, n * sizeof(int));
 }
 */
 
@@ -188,15 +189,16 @@ void FC_FUNC(dspaces_put, DSPACES_PUT) (const char *var_name,
         unsigned int *ver, int *size, int *ndim,
         uint64_t *lb, uint64_t *ub, void *data, int *err, int len)
 {
-	char vname[256];
+    char vname[256];
+    int p_lev = 0; //Yubo tmp fix
 
     if (!fstrncpy(vname, var_name, (size_t) len, sizeof(vname))) {
-		uloga("'%s': failed, can not copy Fortran var of len %d.\n",
-			__func__, len);
-		*err = -ENOMEM;
-	}
+        uloga("'%s': failed, can not copy Fortran var of len %d.\n",
+            __func__, len);
+        *err = -ENOMEM;
+    }
 
-    *err = common_dspaces_put(vname, *ver, *size, *ndim, lb, ub, data);
+    *err = common_dspaces_put(vname, *ver, *size, *ndim, lb, ub, data, p_lev); //Yubo tmp fix
 }
 
 /*

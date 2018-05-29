@@ -220,11 +220,12 @@ void common_dspaces_define_gdim(const char *var_name, int ndim, uint64_t *gdim)
 }
 
 int common_dspaces_get(const char *var_name,
-	unsigned int ver, int size,
-	int ndim,
-	uint64_t *lb,
-	uint64_t *ub,
-	void *data)
+    unsigned int ver, int size,
+    int ndim,
+    uint64_t *lb,
+    uint64_t *ub,
+    void *data,
+    int p_lev)
 {
     if (!is_dspaces_lib_init() || !is_ndim_within_bound(ndim)) {
         return -EINVAL;
@@ -234,6 +235,7 @@ int common_dspaces_get(const char *var_name,
             .version = ver, .owner = -1, 
             .st = st,
             .size = size,
+            .p_lev = p_lev,
             .bb = {.num_dims = ndim,}
     };
     memset(odsc.bb.lb.c, 0, sizeof(uint64_t)*BBOX_MAX_NDIM);
@@ -280,8 +282,13 @@ int common_dspaces_put(const char *var_name,
         int ndim,
         uint64_t *lb,
         uint64_t *ub,
-        const void *data)
+        const void *data,
+        int p_lev)
 {
+#if defined(DS_HAVE_DSPACES_LOCATION_AWARE_WRITE)
+        return common_dspaces_put_location_aware(var_name, ver, size, ndim,
+                                        lb, ub, data);
+#else
         if (!is_dspaces_lib_init() || !is_ndim_within_bound(ndim)) {
             return -EINVAL;
         }
@@ -290,6 +297,7 @@ int common_dspaces_put(const char *var_name,
                 .version = ver, .owner = -1, 
                 .st = st,
                 .size = size,
+                .p_lev = p_lev,
                 .bb = {.num_dims = ndim,}
         };
 
@@ -315,6 +323,7 @@ int common_dspaces_put(const char *var_name,
         // set global dimension
         set_global_dimension(&dcg->gdim_list, var_name, &dcg->default_gdim,
                              &od->gdim); 
+
         err = dcg_obj_put(od);
         if (err < 0) {
             obj_data_free(od);
@@ -325,8 +334,8 @@ int common_dspaces_put(const char *var_name,
         sync_op_id = err;
 
         return 0;
+#endif
 }
-
 
 int common_dspaces_remove (const char *var_name, unsigned int ver)
 {

@@ -202,6 +202,7 @@ AC_CONFIG_FILES([
                 src/Makefile
                 tests/Makefile
                 tests/C/Makefile
+                tests/DAG/Makefile
                 tests/Fortran/Makefile
                 scripts/dspaces_config.makesrc
                 ])
